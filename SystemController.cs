@@ -13,54 +13,25 @@ public delegate void OnResultPacket_ListString(List<string> str);
 public class SystemController : Singleton<SystemController>
 {
     public RawImage rawImage;
-
     public CapturePattern capturePattern;
     public Gallery_Controller gallery_Controller;
     public FirebaseDB_Manager firebaseDB_Manager;
     public FirebaseStorage_Manager firebaseStorage_Manager;
     public PatternChecker patternChecker;
     public UI_Messenger ui_Messenger;
-    
-
     public string deviceID;
     public string deviceDataPath;
 
     private static Queue<Packet> dataQueue = new Queue<Packet>();
     private object lockObject = new object();
     private object lockObject_Twxt = new object();
-
-    string videoPath = "";
-    int PacketCheckCount = 0;
-    List<string> imgNamePatternTrue;
-
-    bool running;
-    string loadingTitleText;
+    private string videoPath = "";
+    private int PacketCheckCount = 0;
+    private List<string> imgNamePatternTrue;
+    private bool running;
+    private string loadingTitleText;
     private static string loadingeRsultText;
-    void Start()
-    {
-        imgNamePatternTrue = new List<string>();
-        deviceID = SystemInfo.deviceUniqueIdentifier;
-        deviceDataPath = Application.persistentDataPath;
 
-        gallery_Controller.OnResultPacket_Error += AddPacket_Error;
-        gallery_Controller.OnResultPacket_PickVideo += AddPacket_VideoPath;
-
-        firebaseDB_Manager.OnResultPacket_Error += AddPacket_Error;
-        firebaseDB_Manager.OnResultPacket_AddDB_Name += AddPacket_SaveStorage;
-        firebaseDB_Manager.OnResultPacket_LoadDB_AllName += AddPacket_SetImgNameCase;
-
-        firebaseStorage_Manager.OnResultPacket_Error += AddPacket_Error;
-        firebaseStorage_Manager.OnResultPacket_Save += AddPacket_CheckSaveStorage;
-        firebaseStorage_Manager.OnResultPacket_DownloadImg += AddPacket_CheckImgPattern;
-        firebaseStorage_Manager.OnResultPacket_DownloadVideo += AddPacket_CheckLoadVideo;
-
-        firebaseStorage_Manager.OnResultPacket_loadProgress += AddPacket_loadProgress;
-
-    }
-    void Update()
-    {
-        DataProcessing();
-    }
     public void ButtonClick_Capture()
     {
         capturePattern.OnCaptureButtonClick();  //rawImage = data
@@ -91,7 +62,33 @@ public class SystemController : Singleton<SystemController>
     {
         dataQueue.Clear();
     }
-    void DataProcessing()
+
+    private void Start()
+    {
+        imgNamePatternTrue = new List<string>();
+        deviceID = SystemInfo.deviceUniqueIdentifier;
+        deviceDataPath = Application.persistentDataPath;
+
+        gallery_Controller.OnResultPacket_Error += AddPacket_Error;
+        gallery_Controller.OnResultPacket_PickVideo += AddPacket_VideoPath;
+
+        firebaseDB_Manager.OnResultPacket_Error += AddPacket_Error;
+        firebaseDB_Manager.OnResultPacket_AddDB_Name += AddPacket_SaveStorage;
+        firebaseDB_Manager.OnResultPacket_LoadDB_AllName += AddPacket_SetImgNameCase;
+
+        firebaseStorage_Manager.OnResultPacket_Error += AddPacket_Error;
+        firebaseStorage_Manager.OnResultPacket_Save += AddPacket_CheckSaveStorage;
+        firebaseStorage_Manager.OnResultPacket_DownloadImg += AddPacket_CheckImgPattern;
+        firebaseStorage_Manager.OnResultPacket_DownloadVideo += AddPacket_CheckLoadVideo;
+
+        firebaseStorage_Manager.OnResultPacket_loadProgress += AddPacket_loadProgress;
+
+    }
+    private void Update()
+    {
+        DataProcessing();
+    }
+    private void DataProcessing()
     {
         if (running == false)
             return;
@@ -188,10 +185,9 @@ public class SystemController : Singleton<SystemController>
                 }
                 break;
         }
-        
     }
 
-    void AddPacket_Error(string str)
+    private void AddPacket_Error(string str)
     {
         Packet packet = (Packet)(new String_Packet(PacketIDCode.Error, str));
         lock (lockObject)
@@ -199,7 +195,7 @@ public class SystemController : Singleton<SystemController>
             dataQueue.Enqueue(packet);
         }
     }
-    void AddPacket_VideoPath(string path)
+    private void AddPacket_VideoPath(string path)
     {
         Packet packet = (Packet)(new String_Packet(PacketIDCode.SetVideoPath, path));
         lock (lockObject)
@@ -207,7 +203,7 @@ public class SystemController : Singleton<SystemController>
             dataQueue.Enqueue(packet);
         }
     }
-    void AddPacket_SaveStorage(string path)
+    private void AddPacket_SaveStorage(string path)
     {
         Packet packet = (Packet)(new String_Packet(PacketIDCode.SaveStorage, path));
         lock (lockObject)
@@ -215,7 +211,7 @@ public class SystemController : Singleton<SystemController>
             dataQueue.Enqueue(packet);
         }
     }
-    void AddPacket_CheckSaveStorage()
+    private void AddPacket_CheckSaveStorage()
     {
         Packet packet = new Packet(PacketIDCode.CheckSaveStorage);
         lock (lockObject)
@@ -223,7 +219,7 @@ public class SystemController : Singleton<SystemController>
             dataQueue.Enqueue(packet);
         }
     }
-    void AddPacket_SetImgNameCase(List<string> nameCase)
+    private void AddPacket_SetImgNameCase(List<string> nameCase)
     {
         Packet packet = (Packet)(new ListString_Packet(PacketIDCode.SetImgNameCase, nameCase));
         lock (lockObject)
@@ -231,7 +227,7 @@ public class SystemController : Singleton<SystemController>
             dataQueue.Enqueue(packet);
         }
     }
-    void AddPacket_CheckImgPattern(string name)
+    private void AddPacket_CheckImgPattern(string name)
     {
         Packet packet = (Packet)(new String_Packet(PacketIDCode.CheckImgPattern, name));
         lock (lockObject)
@@ -239,7 +235,7 @@ public class SystemController : Singleton<SystemController>
             dataQueue.Enqueue(packet);
         }
     }
-    void AddPacket_CheckLoadVideo(string path)
+    private void AddPacket_CheckLoadVideo(string path)
     {
         Packet packet = (Packet)(new String_Packet(PacketIDCode.CheckLoadVideo, path));
         lock (lockObject)
@@ -247,7 +243,7 @@ public class SystemController : Singleton<SystemController>
             dataQueue.Enqueue(packet);
         }
     }
-    void AddPacket_loadProgress(string str)
+    private void AddPacket_loadProgress(string str)
     {
         ui_Messenger.SetLoadingText(loadingTitleText, str);
     }
@@ -259,6 +255,7 @@ public enum PacketIDCode
     SetVideoPath, SaveStorage, CheckSaveStorage,
     SetImgNameCase, CheckImgPattern, CheckLoadVideo
 }
+
 public class Packet
 {
     public Packet(PacketIDCode _id)

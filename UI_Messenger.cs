@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-
 public class UI_Messenger : MonoBehaviour
 {
     public RegisteredVideo_Win registeredVideo_Win;
-    List<string> videoPath;
     public GameObject messageWin;
     public Text messageText;
     public GameObject loadingWin;
     public Text loadingText;
+
+    private List<string> videoPath;
+
     public void OnMessage(string str)
     {
         Debug.Log(str);

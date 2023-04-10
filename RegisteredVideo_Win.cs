@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class RegisteredVideo_Win : MonoBehaviour
 {
-    List<string> videoPathCase = new List<string>();
     public GameObject videoButtonCase;
     public Gallery_Controller Gallery_Controller;
+
+    private List<string> videoPathCase = new List<string>();
 
     public void Add_VideoPath(string path)
     {
@@ -18,7 +20,13 @@ public class RegisteredVideo_Win : MonoBehaviour
         videoPathCase.Clear();
         SettingVideoButton();
     }
-    void SettingVideoButton()
+    public void OnClickVideoButton(int num)
+    {
+        if (videoPathCase.Count > num)
+            Gallery_Controller.PlayVideo(videoPathCase[num]);
+    }
+
+    private void SettingVideoButton()
     {
         int count = videoPathCase.Count;
         foreach (Transform obj in videoButtonCase.transform)
@@ -31,10 +39,5 @@ public class RegisteredVideo_Win : MonoBehaviour
             else
                 obj.gameObject.SetActive(false);
         }
-    }
-    public void OnClickVideoButton(int num)
-    {
-        if (videoPathCase.Count > num)
-            Gallery_Controller.PlayVideo(videoPathCase[num]);
     }
 }

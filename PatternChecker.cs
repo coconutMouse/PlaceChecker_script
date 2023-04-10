@@ -6,13 +6,15 @@ using OpenCVForUnity.CoreModule;
 using OpenCVForUnity.ImgcodecsModule;
 using OpenCVForUnity.ImgprocModule;
 using OpenCVForUnity.UnityUtils;
+
 public class PatternChecker : MonoBehaviour
 {
-    Mat grayMat;
-    Mat patternMat;
-    Pattern pattern;
-    PatternDetector patternDetector;
-    PatternTrackingInfo patternTrackingInfo;
+    private Mat grayMat;
+    private Mat patternMat;
+    private Pattern pattern;
+    private PatternDetector patternDetector;
+    private PatternTrackingInfo patternTrackingInfo;
+
     public void Set_PatternDetector(Texture2D texture)
     {
         patternMat = new Mat(texture.height, texture.width, CvType.CV_8UC4);
@@ -27,7 +29,6 @@ public class PatternChecker : MonoBehaviour
         patternDetector.buildPatternFromImage(patternMat, pattern);
         patternDetector.train(pattern);
     }
-
 
     public bool CheckPattern(string imgPach)
     {
